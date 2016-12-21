@@ -5,6 +5,12 @@
         "vmNamePrefix": {
             "type": "string"
         },
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "Azure region in which to deploy S2D cluster"
+            }
+        },
         "vmCount": {
             "type": "int"
         },
@@ -23,7 +29,7 @@
         {
             "name": "[concat(parameters('vmNamePrefix'), copyindex(), '-nic')]",
             "type": "Microsoft.Network/networkInterfaces",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('location')]",
             "apiVersion": "2015-06-15",
             "copy": {
                 "name": "nicLoopStatic",

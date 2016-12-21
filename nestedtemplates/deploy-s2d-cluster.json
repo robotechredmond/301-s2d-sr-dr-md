@@ -182,6 +182,25 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2015-01-01",
+            "name": "[concat(variables('vmNamePrefix'),'0-primaryIp')]",
+            "dependsOn": [
+                "nicLoop"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('ipLoopTemplateURL')]"
+                },
+                "parameters": {
+                    "ipConfig": {
+                        "value": "[reference(concat(variables('vmNamePrefix'), '0-nic')).ipConfigurations[0].properties.privateIPAddress]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
             "copy": {
                 "name": "primaryIpLoop",
                 "count": "[sub(parameters('vmCount'),1)]"

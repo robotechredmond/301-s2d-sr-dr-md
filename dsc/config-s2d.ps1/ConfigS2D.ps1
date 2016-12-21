@@ -43,7 +43,7 @@ configuration ConfigS2D
 
     )
 
-    Import-DscResource -ModuleName xComputerManagement, xFailOverCluster, xActiveDirectory, xSOFS
+    Import-DscResource -ModuleName xDisk, cDisk, xComputerManagement, xFailOverCluster, xActiveDirectory, xSOFS
  
     [System.Management.Automation.PSCredential]$DomainCreds = New-Object System.Management.Automation.PSCredential ("${DomainNetbiosName}\$($Admincreds.UserName)", $Admincreds.Password)
     [System.Management.Automation.PSCredential]$DomainFQDNCreds = New-Object System.Management.Automation.PSCredential ("${DomainName}\$($Admincreds.UserName)", $Admincreds.Password)

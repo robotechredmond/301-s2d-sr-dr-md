@@ -19,7 +19,7 @@ configuration PrepS2D
         [Int]$RetryIntervalSec=30
     )
 
-    Import-DscResource -ModuleName xComputerManagement,xActiveDirectory
+    Import-DscResource -ModuleName xDisk, cDisk, xComputerManagement,xActiveDirectory
 
     [System.Management.Automation.PSCredential]$DomainCreds = New-Object System.Management.Automation.PSCredential ("${DomainNetbiosName}\$($Admincreds.UserName)", $Admincreds.Password)
     [System.Management.Automation.PSCredential]$DomainFQDNCreds = New-Object System.Management.Automation.PSCredential ("${DomainName}\$($Admincreds.UserName)", $Admincreds.Password)

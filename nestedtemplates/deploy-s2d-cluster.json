@@ -115,10 +115,14 @@
         "vmAvailabilitySetName": "[concat(variables('vmNamePrefix'),'as')]",
         "clusterName": "[concat(variables('vmNamePrefix'),'c')]",
         "vmLoopTemplateURL": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/newVM.json',parameters('_artifactsLocationSasToken'))]",
+        "ipLoopTemplateURL": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/getIpAddress.json',parameters('_artifactsLocationSasToken'))]",
+        "nicStaticTemplateURL": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/setNicStaticIp.json',parameters('_artifactsLocationSasToken'))]",
         "s2dPrepModulesURL": "[concat(parameters('_artifactsLocation'),'/dsc/prep-s2d.ps1.zip',parameters('_artifactsLocationSasToken'))]",
         "s2dPrepFunction": "PrepS2D.ps1\\PrepS2D",
         "s2dConfigModulesURL": "[concat(parameters('_artifactsLocation'),'/dsc/config-s2d.ps1.zip',parameters('_artifactsLocationSasToken'))]",
-        "s2dConfigFunction": "ConfigS2D.ps1\\ConfigS2D"
+        "s2dConfigFunction": "ConfigS2D.ps1\\ConfigS2D",
+        "faultDomainCount": "[length(take(padLeft('',parameters('vmCount'),'x'),3))]",
+        "updateDomainCount": "[length(take(padLeft('',parameters('vmCount'),'x'),5))]"
     },
     "resources": [
         {
@@ -127,8 +131,8 @@
             "apiVersion": "2016-04-30-preview",
             "location": "[parameters('location')]",
             "properties": {
-                "platformFaultDomainCount": 2,
-                "platformUpdateDomainCount": 2,
+                "platformFaultDomainCount": "[variables('faultDomainCount')]",
+                "platformUpdateDomainCount": "[variables('updateDomainCount')]",
                 "managed": "true"
             }
         },
@@ -159,10 +163,125 @@
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
                                 "id": "[parameters('nicSubnetUri')]"
+                            },
+                            "primary": true
+                        }
+                    },
+                    {
+                        "name": "ipconfig2",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[parameters('nicSubnetUri')]"
                             }
                         }
                     }
                 ]
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "copy": {
+                "name": "primaryIpLoop",
+                "count": "[sub(parameters('vmCount'),1)]"
+            },
+            "name": "[concat(variables('vmNamePrefix'),copyIndex(1),'-primaryIp')]",
+            "dependsOn": [
+                "nicLoop",
+                "[concat(variables('vmNamePrefix'),'0-primaryIp')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('ipLoopTemplateURL')]"
+                },
+                "parameters": {
+                    "ipConfig": {
+                        "value": "[reference(concat(variables('vmNamePrefix'), copyIndex(1), '-nic')).ipConfigurations[0].properties.privateIPAddress]"
+                    },
+                    "ipAddresses": {
+                        "value": "[reference(concat(variables('vmNamePrefix'),copyIndex(),'-primaryIp')).outputs.result.value]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "name": "[concat(variables('vmNamePrefix'),'0-clusterIp')]",
+            "dependsOn": [
+                "nicLoop"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('ipLoopTemplateURL')]"
+                },
+                "parameters": {
+                    "ipConfig": {
+                        "value": "[reference(concat(variables('vmNamePrefix'), '0-nic')).ipConfigurations[1].properties.privateIPAddress]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "copy": {
+                "name": "clusterIpLoop",
+                "count": "[sub(parameters('vmCount'),1)]"
+            },
+            "name": "[concat(variables('vmNamePrefix'),copyIndex(1),'-clusterIp')]",
+            "dependsOn": [
+                "nicLoop",
+                "[concat(variables('vmNamePrefix'),'0-clusterIp')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('ipLoopTemplateURL')]"
+                },
+                "parameters": {
+                    "ipConfig": {
+                        "value": "[reference(concat(variables('vmNamePrefix'), copyIndex(1), '-nic')).ipConfigurations[1].properties.privateIPAddress]"
+                    },
+                    "ipAddresses": {
+                        "value": "[reference(concat(variables('vmNamePrefix'),copyIndex(),'-clusterIp')).outputs.result.value]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "name": "[concat(variables('vmNamePrefix'),'setStaticIp')]",
+            "dependsOn": [
+                "primaryIpLoop",
+                "clusterIpLoop"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('nicStaticTemplateURL')]"
+                },
+                "parameters": {
+                    "vmNamePrefix": {
+                        "value": "[variables('vmNamePrefix')]"
+                    },
+                    "vmCount": {
+                        "value": "[parameters('vmCount')]"
+                    },
+                    "ipAddresses1": {
+                        "value": "[reference(concat(variables('vmNamePrefix'),sub(parameters('vmCount'),1),'-primaryIp')).outputs.result.value]"
+                    },
+                    "ipAddresses2": {
+                        "value": "[reference(concat(variables('vmNamePrefix'),sub(parameters('vmCount'),1),'-clusterIp')).outputs.result.value]"
+                    },
+                    "nicSubnetUri": {
+                        "value": "[parameters('nicSubnetUri')]"
+                    }
+                }
             }
         },
         {
@@ -271,6 +390,7 @@
             "dependsOn": [
                 "virtualMachineLoop",
                 "virtualMachineExtensionLoop",
+                "clusterIpLoop",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('witnessStorageName'))]"
             ],
             "properties": {
@@ -288,6 +408,7 @@
                         "shareName": "[parameters('shareName')]",
                         "vmNamePrefix": "[variables('vmNamePrefix')]",
                         "vmCount": "[parameters('vmCount')]",
+                        "clusterIpAddresses": "[reference(concat(variables('vmNamePrefix'),sub(parameters('vmCount'),1),'-clusterIp')).outputs.result.value]",
                         "vmDiskSize": "[parameters('vmDiskSize')]",
                         "witnessStorageName": "[variables('witnessStorageName')]",
                         "witnessStorageKey": {

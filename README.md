@@ -1,4 +1,4 @@
-# Create a Storage Spaces Direct (S2D) SOFS Clusters with Storage Replica for Disaster Recovery
+# Create a Storage Spaces Direct (S2D) SOFS Clusters with Storage Replica for Disaster Recovery across Azure Regions
 This template will create two Storage Spaces Direct (S2D) Scale-Out File Server (SOFS) clusters using Windows Server 2016 in existing VNETs and Active Directory environments across two Azure regions.  These clusters will be configured as an Active/Passive Disaster Recovery solution using Storage Replica.
 
 This template creates the following resources by default:

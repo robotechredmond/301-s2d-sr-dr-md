@@ -65,6 +65,26 @@
     },
     "regionA": {
       "type": "string",
+      "allowedValues": [
+        "West US",
+        "East US",
+        "East US 2",
+        "Central US",
+        "South Central US",
+        "North Central US",
+        "North Europe",
+        "West Europe",
+        "East Asia",
+        "Southeast Asia",
+        "Japan East",
+        "Japan West",
+        "Brazil South",
+        "Australia East",
+        "Australia Southeast",
+        "Central India",
+        "South India",
+        "West India"
+      ],
       "metadata": {
         "description": "Azure region for first S2D cluster deployment"
       }
@@ -89,6 +109,26 @@
     },
     "regionB": {
       "type": "string",
+      "allowedValues": [
+        "West US",
+        "East US",
+        "East US 2",
+        "Central US",
+        "South Central US",
+        "North Central US",
+        "North Europe",
+        "West Europe",
+        "East Asia",
+        "Southeast Asia",
+        "Japan East",
+        "Japan West",
+        "Brazil South",
+        "Australia East",
+        "Australia Southeast",
+        "Central India",
+        "South India",
+        "West India"
+      ],
       "metadata": {
         "description": "Azure region for second S2D cluster deployment - normally should be the paired region for region A"
       }
@@ -277,6 +317,6 @@
     "regionBSofsPath": {
       "type": "string",
       "value": "[concat('\\\\',reference(variables('regionBDeployS2DCluster')).outputs.sofsName.value,'\\',reference(variables('regionBDeployS2DCluster')).outputs.shareName.value)]"
-    },
+    }
   }
 }

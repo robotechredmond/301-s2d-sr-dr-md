@@ -1,10 +1,10 @@
 # Create a Storage Spaces Direct (S2D) SOFS Clusters with Storage Replica for Disaster Recovery across Azure Regions
 This template will create two Storage Spaces Direct (S2D) Scale-Out File Server (SOFS) clusters using Windows Server 2016 in existing VNETs and Active Directory environments across two Azure regions.  These clusters will be configured as an Active/Passive Disaster Recovery solution using Storage Replica.
 
-This template creates the following resources by default:
+This template creates the following resources by default in each of two Azure regions:
 
-+   Two Standard Storage Account for a Cloud Witnesses
-+	Two Windows Server 2016 cluster for storage nodes, provisioned for Storage Spaces Direct (S2D) and the Scale-Out File Server (SOFS) role
++   One Standard Storage Account for a Cloud Witnesses
++	One Windows Server 2016 cluster for storage nodes, provisioned for Storage Spaces Direct (S2D) and the Scale-Out File Server (SOFS) role
 +	An Availability Set for each set of cluster nodes
 
 To deploy the required Azure VNET and Active Directory infrastructure, if not already in place, you may use <a href="https://github.com/Azure/azure-quickstart-templates/tree/master/active-directory-new-domain-ha-2-dc">this template</a> to deploy the prerequisite infrastructure. 
@@ -24,9 +24,9 @@ Click the button below to deploy from the portal:
 
 +	The default settings for storage are to deploy using **premium storage**, which is **strongly** recommended for S2D performance.  When using Premium Storage, be sure to select a VM size (DS-series, GS-series) that supports Premium Storage.
 
-+   The default settings deploy 2 data disks per storage node, but can be increased to up to 32 data disks per node.  When increasing # of data disks, be sure to select a VM size that can support the # of data disks you specify.
++   The default settings deploy 3 data disks per storage node (1 disk used for Storage Replica logs), but can be increased to up to 32 data disks per node.  When increasing # of data disks, be sure to select a VM size that can support the # of data disks you specify.
 
-+ 	The default settings for compute require that you have at least 4 cores of free quota to deploy.
++ 	The default settings for compute require that you have at least 8 cores of free quota to deploy.
 
 + 	The images used to create this deployment are
 	+ 	Windows Server 2016 Datacenter Edition - Latest Image

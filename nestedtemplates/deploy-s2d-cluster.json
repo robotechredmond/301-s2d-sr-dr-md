@@ -65,11 +65,12 @@
         },
         "vmDiskCount": {
             "type": "int",
-            "minValue": 2,
+            "minValue": 3,
             "maxValue": 32,
             "metadata": {
-                "description": "Number of data disks on each S2D VM (Min=2, Max=32). Ensure that the VM size you've selected will support this number of data disks."
-            }
+                "description": "Number of data disks on each S2D VM (Min=3, Max=32). Ensure that the VM size you've selected will support this number of data disks. Note 1 disk will be used for Storage Replica logs"
+            },
+            "defaultValue": 3
         },
         "sofsName": {
             "type": "string",

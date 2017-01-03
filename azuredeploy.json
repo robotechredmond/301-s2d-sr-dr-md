@@ -37,12 +37,12 @@
     },
     "vmDiskCount": {
       "type": "int",
-      "minValue": 3,
+      "minValue": 2,
       "maxValue": 32,
       "metadata": {
-        "description": "Number of data disks on each S2D VM (Min=3, Max=32). Ensure that the VM size you've selected will support this number of data disks. Note 1 disk will be used for Storage Replica logs"
+        "description": "Number of data disks on each S2D VM (Min=2, Max=32). Ensure that the VM size you've selected will support this number of data disks."
       },
-      "defaultValue": 3
+      "defaultValue": 2
     },
     "existingDomainName": {
       "type": "string",
@@ -151,7 +151,7 @@
         "description": "Name of the existing subnet in the existing VNET to which the S2D VMs should be deployed"
       }
     },
-    "sofsName": {
+    "sofsNameSuffix": {
       "type": "string",
       "minLength": 1,
       "maxLength": 6,
@@ -185,8 +185,8 @@
   "variables": {
     "regionANamePrefix": "[concat(parameters('namePrefix'),'-a')]",
     "regionBNamePrefix": "[concat(parameters('namePrefix'),'-b')]",
-    "regionASofsName": "[concat(variables('regionANamePrefix'),'-',parameters('sofsName'))]",
-    "regionBSofsName": "[concat(variables('regionBNamePrefix'),'-',parameters('sofsName'))]",
+    "regionASofsName": "[concat(variables('regionANamePrefix'),'-',parameters('sofsNameSuffix'))]",
+    "regionBSofsName": "[concat(variables('regionBNamePrefix'),'-',parameters('sofsNameSuffix'))]",
     "regionASubnetRef": "[resourceId(parameters('existingRegionAVirtualNetworkRGName'),'Microsoft.Network/virtualNetworks/subnets',parameters('existingRegionAVirtualNetworkName'),parameters('existingRegionASubnetName'))]",
     "regionBSubnetRef": "[resourceId(parameters('existingRegionBVirtualNetworkRGName'),'Microsoft.Network/virtualNetworks/subnets',parameters('existingRegionBVirtualNetworkName'),parameters('existingRegionBSubnetName'))]",
     "deployS2DClusterTemplateURL": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/deploy-s2d-cluster.json',parameters('_artifactsLocationSasToken'))]",
@@ -208,6 +208,12 @@
         "parameters": {
           "namePrefix": {
             "value": "[variables('regionANamePrefix')]"
+          },
+          "remoteNamePrefix": {
+            "value": "[variables('regionBNamePrefix')]"
+          },
+          "activeOrPassive": {
+            "value": "active"
           },
           "location": {
             "value": "[parameters('regionA')]"
@@ -239,6 +245,9 @@
           "sofsName": {
             "value": "[variables('regionASofsName')]"
           },
+          "remoteSofsName": {
+            "value": "[variables('regionBSofsName')]"
+          },
           "shareName": {
             "value": "[parameters('shareName')]"
           },
@@ -265,6 +274,12 @@
         "parameters": {
           "namePrefix": {
             "value": "[variables('regionBNamePrefix')]"
+          },
+          "remoteNamePrefix": {
+            "value": "[variables('regionANamePrefix')]"
+          },
+          "activeOrPassive": {
+            "value": "passive"
           },
           "location": {
             "value": "[parameters('regionB')]"
@@ -295,6 +310,9 @@
           },
           "sofsName": {
             "value": "[variables('regionBSofsName')]"
+          },
+          "remoteSofsName": {
+            "value": "[variables('regionASofsName')]"
           },
           "shareName": {
             "value": "[parameters('shareName')]"

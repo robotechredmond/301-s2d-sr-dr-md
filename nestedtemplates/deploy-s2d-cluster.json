@@ -10,6 +10,24 @@
                 "description": "Naming prefix for each new resource created. 3-char min, 8-char max, lowercase alphanumeric"
             }
         },
+        "remoteNamePrefix": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 8,
+            "metadata": {
+                "description": "Naming prefix for resource records in remote region. 3-char min, 8-char max, lowercase alphanumeric"
+            }
+        },
+        "activeOrPassive": {
+            "type": "string",
+            "allowedValues": [
+                "active",
+                "passive"
+            ],
+            "metadata": {
+                "description": "Specificies whether is cluster is deployed in the Active or Passive DR region"
+            }
+        },
         "location": {
             "type": "string",
             "metadata": {
@@ -65,17 +83,23 @@
         },
         "vmDiskCount": {
             "type": "int",
-            "minValue": 3,
+            "minValue": 2,
             "maxValue": 32,
             "metadata": {
-                "description": "Number of data disks on each S2D VM (Min=3, Max=32). Ensure that the VM size you've selected will support this number of data disks. Note 1 disk will be used for Storage Replica logs"
+                "description": "Number of data disks on each S2D VM (Min=2, Max=32). Ensure that the VM size you've selected will support this number of data disks."
             },
-            "defaultValue": 3
+            "defaultValue": 2
         },
         "sofsName": {
             "type": "string",
             "metadata": {
                 "description": "Name of clustered Scale-Out File Server role"
+            }
+        },
+        "remoteSofsName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of clustered Scale-Out File Server role in remote region"
             }
         },
         "shareName": {
@@ -114,12 +138,13 @@
         "vmNamePrefix": "[concat(parameters('namePrefix'),'-s2d-')]",
         "vmAvailabilitySetName": "[concat(variables('vmNamePrefix'),'as')]",
         "clusterName": "[concat(variables('vmNamePrefix'),'c')]",
+        "remoteClusterName": "[concat(parameters('remoteNamePrefix'),'-s2d-c')]",
         "vmLoopTemplateURL": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/newVM.json',parameters('_artifactsLocationSasToken'))]",
         "ipLoopTemplateURL": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/getIpAddress.json',parameters('_artifactsLocationSasToken'))]",
         "nicStaticTemplateURL": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/setNicStaticIp.json',parameters('_artifactsLocationSasToken'))]",
         "s2dPrepModulesURL": "[concat(parameters('_artifactsLocation'),'/dsc/prep-s2d.ps1.zip',parameters('_artifactsLocationSasToken'))]",
         "s2dPrepFunction": "PrepS2D.ps1\\PrepS2D",
-        "s2dConfigModulesURL": "[concat(parameters('_artifactsLocation'),'/dsc/config-s2d.ps1.zip',parameters('_artifactsLocationSasToken'))]",
+        "s2dConfigModulesURL": "[concat(parameters('_artifactsLocation'),'/dsc/config-s2d-',parameters('activeOrPassive'),'.ps1.zip',parameters('_artifactsLocationSasToken'))]",
         "s2dConfigFunction": "ConfigS2D.ps1\\ConfigS2D",
         "faultDomainCount": "[length(take(padLeft('',parameters('vmCount'),'x'),3))]",
         "updateDomainCount": "[length(take(padLeft('',parameters('vmCount'),'x'),5))]"
@@ -426,7 +451,9 @@
                     "properties": {
                         "domainName": "[parameters('domainName')]",
                         "clusterName": "[variables('clusterName')]",
+                        "remoteClusterName": "[variables('remoteClusterName')]",
                         "sofsName": "[parameters('sofsName')]",
+                        "remoteSofsName": "[parameters('remoteSofsName')]",
                         "shareName": "[parameters('shareName')]",
                         "vmNamePrefix": "[variables('vmNamePrefix')]",
                         "vmCount": "[parameters('vmCount')]",

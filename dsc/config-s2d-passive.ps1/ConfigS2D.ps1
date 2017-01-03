@@ -13,7 +13,13 @@ configuration ConfigS2D
         [String]$ClusterName,
 
         [Parameter(Mandatory)]
+        [String]$RemoteClusterName,
+
+        [Parameter(Mandatory)]
         [String]$SOFSName,
+
+        [Parameter(Mandatory)]
+        [String]$RemoteSOFSName,
 
         [Parameter(Mandatory)]
         [String]$ShareName,
@@ -55,20 +61,7 @@ configuration ConfigS2D
 
     Node localhost
     {
-<#
-        xWaitforDisk Disk2
-        {
-             DiskNumber = 2
-             RetryIntervalSec =$RetryIntervalSec
-             RetryCount = $RetryCount
-        }
-
-        cDiskNoRestart SRLogDisk
-        {
-            DiskNumber = 2
-            DriveLetter = "F"
-        }
-#>        
+     
         WindowsFeature FC
         {
             Name = "Failover-Clustering"
@@ -109,6 +102,12 @@ configuration ConfigS2D
         WindowsFeature SRPS
         {
             Name = "RSAT-Storage-Replica"
+            Ensure = "Present"
+        }
+
+        WindowsFeature SMBBandwidth
+        {
+            Name = "FS-SMBBW"
             Ensure = "Present"
         }
 
@@ -153,10 +152,10 @@ configuration ConfigS2D
             GetScript = "@{Ensure = if ((Get-Cluster).SameSubnetDelay -eq 2000 -and (Get-Cluster).SameSubnetThreshold -eq 15 -and (Get-Cluster).CrossSubnetDelay -eq 3000 -and (Get-Cluster).CrossSubnetThreshold -eq 15) {'Present'} else {'Absent'}}"
             DependsOn = "[Script]CloudWitness"
         }
-<#
+
         Script EnableS2D
         {
-            SetScript = "Enable-ClusterS2D -Confirm:0; New-Volume -StoragePoolFriendlyName S2D* -FriendlyName VDisk01 -FileSystem CSVFS_REFS -UseMaximumSize"
+            SetScript = 'Enable-ClusterS2D -Confirm:0; [int64]$LogSize=((Get-StoragePool | Where-Object { $_.FriendlyName -like "S2D*" }).Size *.02); New-Volume -StoragePoolFriendlyName S2D* -FriendlyName LogVDisk -FileSystem REFS -Size $LogSize -DriveLetter F; New-Volume -StoragePoolFriendlyName S2D* -FriendlyName DataVDisk -FileSystem CSVFS_REFS -UseMaximumSize'
             TestScript = "(Get-ClusterSharedVolume)[0].State -eq 'Online'"
             GetScript = "@{Ensure = if ((Get-ClusterSharedVolume)[0].State -eq 'Online') {'Present'} Else {'Absent'}}"
             DependsOn = "[Script]IncreaseClusterTimeouts"
@@ -176,7 +175,7 @@ configuration ConfigS2D
             GetScript = "@{Ensure = if ((Get-SmbShare -Name ${ShareName} -ErrorAction SilentlyContinue).ShareState -eq 'Online') {'Present'} Else {'Absent'}}"
             DependsOn = "[xSOFS]EnableSOFS"
         }
-#>
+
         LocalConfigurationManager 
         {
             RebootNodeIfNeeded = $true

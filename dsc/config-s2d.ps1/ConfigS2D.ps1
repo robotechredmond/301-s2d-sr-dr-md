@@ -55,7 +55,7 @@ configuration ConfigS2D
 
     Node localhost
     {
-
+<#
         xWaitforDisk Disk2
         {
              DiskNumber = 2
@@ -68,7 +68,7 @@ configuration ConfigS2D
             DiskNumber = 2
             DriveLetter = "F"
         }
-        
+#>        
         WindowsFeature FC
         {
             Name = "Failover-Clustering"
@@ -153,12 +153,12 @@ configuration ConfigS2D
             GetScript = "@{Ensure = if ((Get-Cluster).SameSubnetDelay -eq 2000 -and (Get-Cluster).SameSubnetThreshold -eq 15 -and (Get-Cluster).CrossSubnetDelay -eq 3000 -and (Get-Cluster).CrossSubnetThreshold -eq 15) {'Present'} else {'Absent'}}"
             DependsOn = "[Script]CloudWitness"
         }
-
+<#
         Script EnableS2D
         {
             SetScript = "Enable-ClusterS2D -Confirm:0; New-Volume -StoragePoolFriendlyName S2D* -FriendlyName VDisk01 -FileSystem CSVFS_REFS -UseMaximumSize"
-            TestScript = "(Get-ClusterSharedVolume).State -eq 'Online'"
-            GetScript = "@{Ensure = if ((Get-ClusterSharedVolume).State -eq 'Online') {'Present'} Else {'Absent'}}"
+            TestScript = "(Get-ClusterSharedVolume)[0].State -eq 'Online'"
+            GetScript = "@{Ensure = if ((Get-ClusterSharedVolume)[0].State -eq 'Online') {'Present'} Else {'Absent'}}"
             DependsOn = "[Script]IncreaseClusterTimeouts"
         }
 
@@ -176,7 +176,7 @@ configuration ConfigS2D
             GetScript = "@{Ensure = if ((Get-SmbShare -Name ${ShareName} -ErrorAction SilentlyContinue).ShareState -eq 'Online') {'Present'} Else {'Absent'}}"
             DependsOn = "[xSOFS]EnableSOFS"
         }
-
+#>
         LocalConfigurationManager 
         {
             RebootNodeIfNeeded = $true

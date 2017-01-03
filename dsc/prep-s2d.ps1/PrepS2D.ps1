@@ -26,7 +26,7 @@ configuration PrepS2D
 
     Node localhost
     {
-
+<#
         xWaitforDisk Disk2
         {
              DiskNumber = 2
@@ -39,7 +39,7 @@ configuration PrepS2D
             DiskNumber = 2
             DriveLetter = "F"
         }
-
+#>
         WindowsFeature FC
         {
             Name = "Failover-Clustering"

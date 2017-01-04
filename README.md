@@ -54,10 +54,10 @@ You can optionally specify a storage account to use, if so the storage account m
 one will be created by the script or reused if it already exists (think of this as "temp" storage for AzureRM).
 
 ```PowerShell
-.\Deploy-AzureResourceGroup.ps1 -ResourceGroupLocation 'eastus' -ArtifactsStagingDirectory '301-storage-spaces-direct' -UploadArtifacts 
+.\Deploy-AzureResourceGroup.ps1 -ResourceGroupLocation 'eastus' -ArtifactsStagingDirectory '301-s2d-sr-dr-md' -UploadArtifacts 
 ```
 ```bash
-azure-group-deploy.sh -a '301-storage-spaces-direct' -l eastus -u
+azure-group-deploy.sh -a '301-s2d-sr-dr-md ' -l eastus -u
 ```
 
 Tags: ``cluster, ha, storage spaces, storage spaces direct, S2D, storage replica, windows server 2016, ws2016``

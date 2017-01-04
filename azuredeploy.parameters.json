@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "namePrefix": {
-      "value": "GEN-UNIQUE-8"
+      "value": "GEN-UNIQUE-6"
     },
     "existingDomainName": {
       "value": "contoso.com"
@@ -14,13 +14,28 @@
     "adminPassword": {
       "value": "GEN-PASSWORD"
     },
-    "existingVirtualNetworkName": {
-      "value": "vnet01"
+    "regionA": {
+      "value": "Southeast Asia"
     },
-    "existingVirtualNetworkRGName": {
-      "value": "rg01"
+    "existingRegionAVirtualNetworkName": {
+      "value": "vnetA"
+    },
+    "existingRegionAVirtualNetworkRGName": {
+      "value": "rgA"
     },    
-    "existingSubnetName": {
+    "existingRegionASubnetName": {
+      "value": "default"
+    },
+    "regionB": {
+      "value": "East Asia"
+    },
+    "existingRegionBVirtualNetworkName": {
+      "value": "vnetB"
+    },
+    "existingRegionBVirtualNetworkRGName": {
+      "value": "rgB"
+    },    
+    "existingRegionBSubnetName": {
       "value": "default"
     }
   }

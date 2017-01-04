@@ -9,7 +9,7 @@ This template creates the following resources by default in each of two Azure re
 
 To deploy the required Azure VNET and Active Directory infrastructure, if not already in place, you may use <a href="https://github.com/Azure/azure-quickstart-templates/tree/master/active-directory-new-domain-ha-2-dc">this template</a> to deploy the prerequisite infrastructure. 
 
-To extend this VNET infrastructure to a VNET-to-VNET infrastructure across Azure region, if not already in place, you may use <a href="https://github.com/Azure/azure-quickstart-templates/tree/master/201-extend-vnet-to-multi-vnet">this template</a> to deploy this prerequisite connectivity.
+To extend this VNET infrastructure to a VNET-to-VNET infrastructure across Azure regions, if not already in place, you may use <a href="https://github.com/robotechredmond/extend-vnet-to-multi-vnet">this template</a> to deploy this prerequisite connectivity.
 
 Click the button below to deploy from the portal:
 

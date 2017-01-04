@@ -52,7 +52,7 @@ function Set-TargetResource
 
         for ($count = 0; $count -lt $RetryCount; $count++)
         {
-            if (Test-Path $SharePath -PathType Container -ErrorAction Ignore)
+            if (Test-Path -Path $SharePath -ErrorAction Ignore)
             {
                 Write-Verbose -Message "Found file share '$($SharePath)'."
                 $fileShareFound = $true
@@ -101,7 +101,7 @@ function Test-TargetResource
     {
         ($oldToken, $context, $newToken) = ImpersonateAs -cred $DomainAdministratorCredential
 
-        if (Test-Path $SharePath -PathType Container -ErrorAction Ignore)
+        if (Test-Path -Path $SharePath -ErrorAction Ignore)
         {
             Write-Verbose -Message "Found file share '$($SharePath)'."
             $true

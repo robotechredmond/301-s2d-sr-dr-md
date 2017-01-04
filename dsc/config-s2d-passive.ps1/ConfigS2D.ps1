@@ -49,7 +49,7 @@ configuration ConfigS2D
 
     )
 
-    Import-DscResource -ModuleName xDisk, cDisk, xComputerManagement, xFailOverCluster, xActiveDirectory, xSOFS
+    Import-DscResource -ModuleName xComputerManagement, xFailOverCluster, xActiveDirectory, xSOFS
  
     [System.Management.Automation.PSCredential]$DomainCreds = New-Object System.Management.Automation.PSCredential ("${DomainNetbiosName}\$($Admincreds.UserName)", $Admincreds.Password)
     [System.Management.Automation.PSCredential]$DomainFQDNCreds = New-Object System.Management.Automation.PSCredential ("${DomainName}\$($Admincreds.UserName)", $Admincreds.Password)
@@ -156,8 +156,8 @@ configuration ConfigS2D
         Script EnableS2D
         {
             SetScript = 'Enable-ClusterS2D -Confirm:0; [int64]$LogSize=((Get-StoragePool | Where-Object { $_.FriendlyName -like "S2D*" }).Size *.02); New-Volume -StoragePoolFriendlyName S2D* -FriendlyName LogVDisk -FileSystem REFS -Size $LogSize -DriveLetter F; New-Volume -StoragePoolFriendlyName S2D* -FriendlyName DataVDisk -FileSystem CSVFS_REFS -UseMaximumSize'
-            TestScript = "(Get-ClusterSharedVolume)[0].State -eq 'Online'"
-            GetScript = "@{Ensure = if ((Get-ClusterSharedVolume)[0].State -eq 'Online') {'Present'} Else {'Absent'}}"
+            TestScript = "(Get-ClusterSharedVolume).State -eq 'Online'"
+            GetScript = "@{Ensure = if ((Get-ClusterSharedVolume).State -eq 'Online') {'Present'} Else {'Absent'}}"
             DependsOn = "[Script]IncreaseClusterTimeouts"
         }
 

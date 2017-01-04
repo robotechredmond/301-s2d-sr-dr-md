@@ -1,5 +1,5 @@
 ﻿#
-# xSOFS: DSC resource to configure a Scale-out File Server Cluster Resource. 
+# xSRPartnership: DSC resource to configure a Storage Replica partnership. 
 #
 
 function Get-TargetResource
@@ -16,7 +16,7 @@ function Get-TargetResource
         [string] $ReplicationMode,
 
         [parameter(Mandatory)]
-        [int] $AsyncRPO,
+        [uint32] $AsyncRPO,
 
         [parameter(Mandatory)]
         [PSCredential] $DomainAdministratorCredential

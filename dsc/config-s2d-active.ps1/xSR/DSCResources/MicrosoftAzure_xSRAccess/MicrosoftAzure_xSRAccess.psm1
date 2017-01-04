@@ -19,7 +19,7 @@ function Get-TargetResource
     try
     {
         ($oldToken, $context, $newToken) = ImpersonateAs -cred $DomainAdministratorCredential
-        $retvalue = @{Ensure = if (((Get-SRAccess -ErrorAction SilentlyContinue).PairedClusterName -eq $RemoteClusterName) -and ((Get-SRAccess -ComputerName $$RemoteClusterName -ErrorAction SilentlyContinue).PairedClusterName -eq $ClusterName)) {'Present'} Else {'Absent'}}
+        $retvalue = @{Ensure = if (((Get-SRAccess -ErrorAction SilentlyContinue).PairedClusterName -eq $RemoteClusterName) -and ((Get-SRAccess -ComputerName $RemoteClusterName -ErrorAction SilentlyContinue).PairedClusterName -eq $ClusterName)) {'Present'} Else {'Absent'}}
     }
     finally
     {
@@ -83,7 +83,7 @@ function Test-TargetResource
     try
     {
         ($oldToken, $context, $newToken) = ImpersonateAs -cred $DomainAdministratorCredential
-        $retvalue = ((Get-SRAccess -ErrorAction SilentlyContinue).PairedClusterName -eq $ClusterB) -and ((Get-SRAccess -ComputerName $ClusterB -ErrorAction SilentlyContinue).PairedClusterName -eq $ClusterA)
+        $retvalue = ((Get-SRAccess -ErrorAction SilentlyContinue).PairedClusterName -eq $RemoteClusterName) -and ((Get-SRAccess -ComputerName $RemoteClusterName -ErrorAction SilentlyContinue).PairedClusterName -eq $ClusterName)
     }
     finally
     {

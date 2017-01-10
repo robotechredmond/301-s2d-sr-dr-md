@@ -37,7 +37,7 @@
 
 # Specify deployment parameter values that are common to both regions
 
-    $VMSize = "Standard_DS5_v2"
+    $VMSize = "Standard_DS1_v2"
 
     $VMCount = 2
 

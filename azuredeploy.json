@@ -15,7 +15,7 @@
       "metadata": {
         "description": "Size of the S2D VMs to be created"
       },
-      "defaultValue": "Standard_DS5_v2"
+      "defaultValue": "Standard_DS1_v2"
     },
     "vmCount": {
       "type": "int",
@@ -33,7 +33,7 @@
       "metadata": {
         "description": "Size of each data disk in GB on each S2D VM (Min=128, Max=1023)"
       },
-      "defaultValue": 1023
+      "defaultValue": 128
     },
     "vmDiskCount": {
       "type": "int",

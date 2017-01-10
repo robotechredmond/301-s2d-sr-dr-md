@@ -51,7 +51,7 @@
       "metadata": {
         "description": "Storage Replica Log Size in GB. Ensure that disks selected above will have sufficient space for a Log Volume of this size."
       },
-      "defaultValue": 300
+      "defaultValue": 8
     },
     "srAsyncRPO": {
       "type": "int",

@@ -81,32 +81,6 @@
         "description": "Password for the Administrator account of the existing Active Directory Domain"
       }
     },
-    "regionA": {
-      "type": "string",
-      "allowedValues": [
-        "West US",
-        "East US",
-        "East US 2",
-        "Central US",
-        "South Central US",
-        "North Central US",
-        "North Europe",
-        "West Europe",
-        "East Asia",
-        "Southeast Asia",
-        "Japan East",
-        "Japan West",
-        "Brazil South",
-        "Australia East",
-        "Australia Southeast",
-        "Central India",
-        "South India",
-        "West India"
-      ],
-      "metadata": {
-        "description": "Azure region for first S2D cluster deployment"
-      }
-    },
     "existingRegionAVirtualNetworkRGName": {
       "type": "string",
       "metadata": {
@@ -123,32 +97,6 @@
       "type": "string",
       "metadata": {
         "description": "Name of the existing subnet in the existing VNET in Region A to which the S2D VMs should be deployed"
-      }
-    },
-    "regionB": {
-      "type": "string",
-      "allowedValues": [
-        "West US",
-        "East US",
-        "East US 2",
-        "Central US",
-        "South Central US",
-        "North Central US",
-        "North Europe",
-        "West Europe",
-        "East Asia",
-        "Southeast Asia",
-        "Japan East",
-        "Japan West",
-        "Brazil South",
-        "Australia East",
-        "Australia Southeast",
-        "Central India",
-        "South India",
-        "West India"
-      ],
-      "metadata": {
-        "description": "Azure region for second S2D cluster deployment - normally should be the paired region for region A"
       }
     },
     "existingRegionBVirtualNetworkRGName": {
@@ -213,78 +161,6 @@
   },
   "resources": [
     {
-      "name": "[variables('regionADeployS2DCluster')]",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2015-01-01",
-      "dependsOn": [],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('deployS2DClusterTemplateURL')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "namePrefix": {
-            "value": "[variables('regionANamePrefix')]"
-          },
-          "remoteNamePrefix": {
-            "value": "[variables('regionBNamePrefix')]"
-          },
-          "activeOrPassive": {
-            "value": "active"
-          },
-          "location": {
-            "value": "[parameters('regionA')]"
-          },
-          "domainName": {
-            "value": "[parameters('existingDomainName')]"
-          },
-          "adminUsername": {
-            "value": "[parameters('adminUsername')]"
-          },
-          "adminPassword": {
-            "value": "[parameters('adminPassword')]"
-          },
-          "nicSubnetUri": {
-            "value": "[variables('regionASubnetRef')]"
-          },
-          "vmSize": {
-            "value": "[parameters('vmSize')]"
-          },
-          "vmCount": {
-            "value": "[parameters('vmCount')]"
-          },
-          "vmDiskSize": {
-            "value": "[parameters('vmDiskSize')]"
-          },
-          "vmDiskCount": {
-            "value": "[parameters('vmDiskCount')]"
-          },
-          "srLogSize": {
-            "value": "[parameters('srLogSize')]"
-          },
-          "srAsyncRPO": {
-            "value": "[parameters('srAsyncRPO')]"
-          },
-          "sofsName": {
-            "value": "[variables('regionASofsName')]"
-          },
-          "remoteSofsName": {
-            "value": "[variables('regionBSofsName')]"
-          },
-          "shareName": {
-            "value": "[parameters('shareName')]"
-          },
-          "_artifactsLocation": {
-            "value": "[parameters('_artifactsLocation')]"
-          },
-          "_artifactsLocationSasToken": {
-            "value": "[parameters('_artifactsLocationSasToken')]"
-          }
-        }
-      }
-    },
-    {
       "name": "[variables('regionBDeployS2DCluster')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
@@ -306,7 +182,7 @@
             "value": "passive"
           },
           "location": {
-            "value": "[parameters('regionB')]"
+            "value": "[resourceGroup().location]"
           },
           "domainName": {
             "value": "[parameters('existingDomainName')]"
@@ -358,10 +234,6 @@
     }
   ],
   "outputs": {
-    "regionASofsPath": {
-      "type": "string",
-      "value": "[concat('\\\\',reference(variables('regionADeployS2DCluster')).outputs.sofsName.value,'\\',reference(variables('regionADeployS2DCluster')).outputs.shareName.value)]"
-    },
     "regionBSofsPath": {
       "type": "string",
       "value": "[concat('\\\\',reference(variables('regionBDeployS2DCluster')).outputs.sofsName.value,'\\',reference(variables('regionBDeployS2DCluster')).outputs.shareName.value)]"

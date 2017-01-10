@@ -87,8 +87,23 @@
             "maxValue": 32,
             "metadata": {
                 "description": "Number of data disks on each S2D VM (Min=2, Max=32). Ensure that the VM size you've selected will support this number of data disks."
-            },
-            "defaultValue": 2
+            }
+        },
+        "srLogSize": {
+            "type": "int",
+            "minValue": 8,
+            "maxValue": 1023,
+            "metadata": {
+                "description": "Storage Replica Log Size in GB. Ensure that disks selected above will have sufficient space for a Log Volume of this size."
+            }
+        },
+        "srAsyncRPO": {
+            "type": "int",
+            "minValue": 30,
+            "maxValue": 3600,
+            "metadata": {
+                "description": "Storage Replica Recovery Point Objective (RPO) in Seconds"
+            }
         },
         "sofsName": {
             "type": "string",
@@ -459,6 +474,8 @@
                         "vmCount": "[parameters('vmCount')]",
                         "clusterIpAddresses": "[reference(concat(variables('vmNamePrefix'),sub(parameters('vmCount'),1),'-clusterIp')).outputs.result.value]",
                         "vmDiskSize": "[parameters('vmDiskSize')]",
+                        "srLogSize": "[parameters('srLogSize')]",
+                        "srAsyncRPO": "[parameters('srAsyncRPO')]",
                         "witnessStorageName": "[variables('witnessStorageName')]",
                         "witnessStorageKey": {
                             "userName": "PLACEHOLDER-DO-NOT-USE",

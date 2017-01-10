@@ -46,7 +46,8 @@ configuration ConfigS2D
 
         [Int]$RetryCount=20,
         [Int]$RetryIntervalSec=30,
-        [Int]$AsyncRPO=300
+        [Int]$SRLogSize=8,
+        [Int]$SRAsyncRPO=300
 
     )
 
@@ -156,7 +157,7 @@ configuration ConfigS2D
 
         Script EnableS2D
         {
-            SetScript = 'Enable-ClusterS2D -Confirm:0; [int64]$LogSize=((Get-StoragePool | Where-Object { $_.FriendlyName -like "S2D*" }).Size *.02); New-Volume -StoragePoolFriendlyName S2D* -FriendlyName LogVDisk -FileSystem REFS -Size $LogSize -DriveLetter F; New-Volume -StoragePoolFriendlyName S2D* -FriendlyName DataVDisk -FileSystem CSVFS_REFS -UseMaximumSize'
+            SetScript = "Enable-ClusterS2D -Confirm:0; New-Volume -StoragePoolFriendlyName S2D* -FriendlyName LogVDisk -FileSystem REFS -Size $($SRLogSize*1024*1024*1024) -DriveLetter F; New-Volume -StoragePoolFriendlyName S2D* -FriendlyName DataVDisk -FileSystem CSVFS_REFS -UseMaximumSize"
             TestScript = "(Get-ClusterSharedVolume).State -eq 'Online'"
             GetScript = "@{Ensure = if ((Get-ClusterSharedVolume).State -eq 'Online') {'Present'} Else {'Absent'}}"
             DependsOn = "[Script]IncreaseClusterTimeouts"
@@ -197,7 +198,7 @@ configuration ConfigS2D
             ClusterName = $ClusterName
             RemoteClusterName = $RemoteClusterName
             ReplicationMode = "Asynchronous"
-            AsyncRPO = $AsyncRPO
+            AsyncRPO = $SRAsyncRPO
             DomainAdministratorCredential = $DomainCreds
             DependsOn = "[xSRAccess]GrantSRAccessToRemoteCluster"
         }

@@ -13,13 +13,15 @@
 # limitations under the License.
 #--------------------------------------------------------------------------
 
-# Sign-in with Azure account
+#region Sign-in with Azure account
 
     $Error.Clear()
 
     Login-AzureRmAccount
 
-# Select Azure Subscription
+#endregion
+
+#region Select Azure Subscription
 
     $subscriptionId = 
         ( Get-AzureRmSubscription |
@@ -31,13 +33,17 @@
     Select-AzureRmSubscription `
         -SubscriptionId $subscriptionId
 
-# Specify unique deployment name prefix (up to 6 alphanum chars)
+#endregion
+
+#region Specify unique deployment name prefix (up to 6 alphanum chars)
 
     $NamePrefix = -join ((97..122) | Get-Random -Count 6 | % {[char]$_})
 
-# Specify deployment parameter values that are common to both regions
+#endregion
 
-    $VMSize = "Standard_DS1_v2"
+#region Specify deployment parameter values that are common to both regions
+
+    $VMSize = "Standard_DS2_v2"
 
     $VMCount = 2
 
@@ -65,7 +71,9 @@
 
     $artifactsLocationSasToken = ""
 
-# Specify deployment values for Region A
+#endregion
+
+#region Specify deployment values for Region A
 
     $RegionATemplateName = "azuredeploya.json"
 
@@ -111,7 +119,9 @@
           -VirtualNetwork $RegionAVnet `
           -Name $RegionASubnetName
 
-# Specify deployment values for Region B
+#endregion
+
+#region Specify deployment values for Region B
 
     $RegionBTemplateName = "azuredeployb.json"
 
@@ -157,43 +167,36 @@
           -VirtualNetwork $RegionBVnet `
           -Name $RegionBSubnetName
 
+#endregion
 
-# Define hash table for parameter values
+#region Define hash table for parameter values
 
     $ARMTemplateParams = @{
-        namePrefix = $NamePrefix;
-        vmSize = $VMSize;
-        vmCount = $VMCount;
-        vmDiskSize = $VMDiskSize;
-        vmDiskCount = $VMDiskCount;
-        srLogSize = $SRLogSize;
-        srAsyncRPO = $SRAsyncRPO;
-        existingDomainName = $DomainName;
-        adminUsername = $AdminUsername;
-        adminPassword = $AdminPassword;
-        existingRegionAVirtualNetworkRGName = $RegionARGName;
-        existingRegionAVirtualNetworkName = $RegionAVnetName;
-        existingRegionASubnetName = $RegionASubnetName;
-        existingRegionBVirtualNetworkRGName = $RegionBRGName;
-        existingRegionBVirtualNetworkName = $RegionBVnetName;
-        existingRegionBSubnetName = $RegionBSubnetName;
-        sofsNameSuffix = $sofsNameSuffix;
-        shareName = $shareName;
-        _artifactsLocation = $artifactsLocation;
-        _artifactsLocationSasToken = $artifactsLocationSasToken
+        "namePrefix" = "$NamePrefix";
+        "vmSize" = "$VMSize";
+        "vmCount" = $VMCount;
+        "vmDiskSize" = $VMDiskSize;
+        "vmDiskCount" = $VMDiskCount;
+        "srLogSize" = $SRLogSize;
+        "srAsyncRPO" = $SRAsyncRPO;
+        "existingDomainName" = "$DomainName";
+        "adminUsername" = "$AdminUsername";
+        "adminPassword" = "$AdminPassword";
+        "existingRegionAVirtualNetworkRGName" = "$RegionARGName";
+        "existingRegionAVirtualNetworkName" = "$RegionAVnetName";
+        "existingRegionASubnetName" = "$RegionASubnetName";
+        "existingRegionBVirtualNetworkRGName" = "$RegionBRGName";
+        "existingRegionBVirtualNetworkName" = "$RegionBVnetName";
+        "existingRegionBSubnetName" = "$RegionBSubnetName";
+        "sofsNameSuffix" = "$sofsNameSuffix";
+        "shareName" = "$shareName";
+        "_artifactsLocation" = "$artifactsLocation";
+        "_artifactsLocationSasToken" = "$artifactsLocationSasToken"
     }
 
-# Deploy template to Region A 
+#endregion
 
-    New-AzureRmResourceGroupDeployment `
-        -Name $RegionADeploymentName `
-        -ResourceGroupName $RegionARGName `
-        -TemplateParameterObject $ARMTemplateParams `
-        -TemplateUri "${artifactsLocation}/${RegionATemplateName}${artifactsLocationSasToken}" `
-        -Mode Incremental `
-        -DeploymentDebugLogLevel All
-
-# Deploy template to Region B
+#region First template deployment to Region B 
 
     New-AzureRmResourceGroupDeployment `
         -Name $RegionBDeploymentName `
@@ -201,8 +204,28 @@
         -TemplateParameterObject $ARMTemplateParams `
         -TemplateUri "${artifactsLocation}/${RegionBTemplateName}${artifactsLocationSasToken}" `
         -Mode Incremental `
-        -DeploymentDebugLogLevel All
+        -DeploymentDebugLogLevel All `
+        -Confirm
 
-# Clear deployment parameters
+#endregion
+
+
+#region Second template deployment to Region A
+
+    New-AzureRmResourceGroupDeployment `
+        -Name $RegionADeploymentName `
+        -ResourceGroupName $RegionARGName `
+        -TemplateParameterObject $ARMTemplateParams `
+        -TemplateUri "${artifactsLocation}/${RegionATemplateName}${artifactsLocationSasToken}" `
+        -Mode Incremental `
+        -DeploymentDebugLogLevel All `
+        -Confirm
+
+#endregion
+
+
+#region Clear deployment parameters
 
     $ARMTemplateParams = @{}
+
+#endregion

@@ -196,7 +196,10 @@
 
 #endregion
 
-#region First template deployment to Region B 
+try
+{
+
+    #region First template deployment to Region B 
 
     New-AzureRmResourceGroupDeployment `
         -Name $RegionBDeploymentName `
@@ -204,13 +207,13 @@
         -TemplateParameterObject $ARMTemplateParams `
         -TemplateUri "${artifactsLocation}/${RegionBTemplateName}${artifactsLocationSasToken}" `
         -Mode Incremental `
-        -DeploymentDebugLogLevel All `
+        -ErrorAction Stop `
         -Confirm
 
-#endregion
+    #endregion
 
 
-#region Second template deployment to Region A
+    #region Second template deployment to Region A
 
     New-AzureRmResourceGroupDeployment `
         -Name $RegionADeploymentName `
@@ -218,10 +221,16 @@
         -TemplateParameterObject $ARMTemplateParams `
         -TemplateUri "${artifactsLocation}/${RegionATemplateName}${artifactsLocationSasToken}" `
         -Mode Incremental `
-        -DeploymentDebugLogLevel All `
+        -ErrorAction Stop `
         -Confirm
 
-#endregion
+    #endregion
+
+}
+catch 
+{
+    Write-Error -Exception $_.Exception
+}
 
 
 #region Clear deployment parameters

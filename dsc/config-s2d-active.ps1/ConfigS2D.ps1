@@ -182,6 +182,8 @@ configuration ConfigS2D
         {
             SharePath = "\\$RemoteSOFSName\$ShareName"
             DomainAdministratorCredential = $DomainCreds
+            RetryCount = 100
+            RetryIntervalSec = 30
             DependsOn = "[Script]CreateShare"
         }
 
